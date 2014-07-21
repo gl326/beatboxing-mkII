@@ -141,7 +141,7 @@ public class Player : MonoBehaviour {
 
 		//if (newState!=oldState){
 			animation.SetInteger("state",newState);
-			animation.SetTrigger("beatchange");
+		if (!attackingLong){animation.SetTrigger("beatchange");}
 		float timeToNext = (60f/_boxer.BPM());
 		float animLength = ((animationList[newState].clip.length/(float)animationList[newState].beats));
 		animation.speed = (animLength/timeToNext)*animationSpeedOffset;
