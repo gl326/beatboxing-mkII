@@ -41,7 +41,8 @@ public class BGFX : MonoBehaviour {
 	void Update () {
 		beatLine.walkManual = -(0f*_boxer.Beat());//-Mathf.Pow(2f*((_boxer.Beat()+.5f)%1f),2f);
 		beatLine.amp += ((maxAmp * (1f-Mathf.Pow(_boxer.Beat()%1f,1f/2f))*Mathf.Sign (Mathf.Sin (_boxer.Beat()*Mathf.PI)))-beatLine.amp)*0.4f;
-		beatLineTrans.eulerAngles = new Vector3(0f,50f*Mathf.Sin (_boxer.Beat()*Mathf.PI),0f);
+		beatLineTrans.localEulerAngles = new Vector3(0f,50f*Mathf.Sin (_boxer.Beat()*Mathf.PI),0f);
+		beatLineTrans.localPosition = new Vector3(5f*Mathf.Sin (_boxer.Beat()*Mathf.PI),-2.3f,0f);
 			//Mathf.Max (1f,Mathf.Min (maxAmp,Mathf.Tan(-(Mathf.PI*_boxer.Beat())-(Mathf.PI/2f))));
 			//Mathf.Pow (Mathf.Abs (Mathf.Sin (Mathf.PI*_boxer.Beat())), 2f)*maxAmp;))
 		//beatLine.freq = minFreq + ((maxFreq-minFreq)*Mathf.Pow (Mathf.Abs (Mathf.Sin (Mathf.PI*_boxer.Beat())), 1f/2f));

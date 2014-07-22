@@ -21,6 +21,9 @@ public class BeatBoxer : MonoBehaviour {
 	public bool doubleTime = false;
 	public List<Pattern> soundSet; //list of moves. 0 is *always* the intro
 	public List<Attack> attackSet;
+	public BeatAnimation[] animationList;
+
+	private string anim = "idle";
 
 	private List<Pattern> playlist;
 	private Pattern song;
@@ -46,6 +49,7 @@ public class BeatBoxer : MonoBehaviour {
 	private Player _player;
 	private Transform _enemy;
 	private Transform _enemyModel;
+	private Animator animation;
 	private List<GameObject> popUps;
 	private Camera _mainCamera;
 	//private int QueuedFrames = 0;
@@ -86,6 +90,7 @@ public class BeatBoxer : MonoBehaviour {
 		_enemyModel = (Instantiate(boxerModel) as GameObject).transform;
 		_enemyModel.parent = _enemy;
 		_enemyModel.localPosition = Vector3.zero;
+		animation = _enemy.GetComponentInChildren<Animator>();
 
 		attackStream = new List<Attack>();
 		frameData = new AttackFrame();
@@ -199,6 +204,8 @@ public class BeatBoxer : MonoBehaviour {
 		}
 		frameData = LoadFrame(currentAttack,currentFrame);
 		Debug.Log ("Using "+currentAttack.name+", frame "+(currentFrame+1)+"/"+(currentAttack.frames.Count));
+
+		if (frameData.anim!="" && frameData.anim!=anim){animation.SetTrigger(anim);}
 		
 		if (frameData.attackingShort && frameData.attackingLong){_playerParts.Swipe(Vector3.left);}
 		if (frameData.attackingShort && !frameData.attackingLong){_playerParts.Swipe(Vector3.down);}
@@ -280,7 +287,7 @@ public class BeatBoxer : MonoBehaviour {
 			p.tex = spr;
 			p.beat_target = Mathf.Floor (beat_target);
 			//p.life = 60f/BPM ();
-			p.transform.position = t -(2f*Vector3.forward);
+			p.transform.position = t +(2f*Vector3.forward);
 			p.Start();
 
 	
@@ -315,17 +322,14 @@ public class BeatBoxer : MonoBehaviour {
 			_enemyModel.localPosition = 
 				new Vector3(-shake+Random.Range(0f,2f*shake),-shake+Random.Range(0f,2f*shake),-shake+Random.Range(0f,2f*shake));
 		}else{_enemyModel.localPosition = Vector3.zero;}
+
+		////enemy animation speed
+		float timeToNext = (60f/BPM());
+		float animLength = animation.GetCurrentAnimatorStateInfo(0).length/(float)animationList[animIndex(anim)].beats;
+		animation.speed = (animLength/timeToNext);
 		
 		///////background color
 		_mainCamera.backgroundColor = Color.Lerp (colorSet.bgColor1,colorSet.bgColor2,Mathf.Pow (Mathf.Abs(.5f-(beats%1f))/.5f,4f));
-
-		//////light color changes
-		 /*
-		int theBeat = Mathf.FloorToInt(beats);
-		_bg.lights.GetChild((theBeat)%3).light.color = Color.Lerp(colorSet.lightColorB,colorSet.lightColorA,Mathf.Sqrt(beats%1f));
-		_bg.lights.GetChild((theBeat+1)%3).light.color = Color.Lerp(colorSet.lightColorC,colorSet.lightColorB,Mathf.Sqrt(beats%1f));
-		_bg.lights.GetChild((theBeat+2)%3).light.color = Color.Lerp(colorSet.lightColorA,colorSet.lightColorC,Mathf.Sqrt(beats%1f));
-		*/
 	}
 
 	// high fidelity for inputs
@@ -364,6 +368,16 @@ public class BeatBoxer : MonoBehaviour {
 				DelayedBeat();
 			}
 		}
+	}
+
+	int animIndex(string a, int def = 0){
+		for (int i=0;i<animationList.Length;i+=1){
+			if (animationList[i].name == a){
+				return i;
+				break;
+			}
+		}
+		return def;
 	}
 
 	public float Beat(){
@@ -429,8 +443,9 @@ public class Attack //a series of preset states over several beats
 { 
 	public string name;
 	public List<AttackFrame> frames;
+
 	
-	public Attack(string str, List<AttackFrame> l)
+	public Attack(string str, List<AttackFrame> l, string a="")
 	{
 		this.name = name;
 		this.frames = l;
@@ -441,17 +456,19 @@ public class Attack //a series of preset states over several beats
 [System.Serializable]
 public class AttackFrame //one beat of an attack
 { 
+	public string anim = "";
 	public bool blockingShort = false;
 	public bool blockingLong = false;
 	public bool attackingShort = false;
 	public bool attackingLong = false;
 	
-	public AttackFrame(bool bS, bool bL, bool aS, bool aL )
+	public AttackFrame(bool bS, bool bL, bool aS, bool aL, string anim )
 	{
 		blockingShort = bS;
 		blockingLong = bL;
 		attackingShort = aS;
 		attackingLong = aL;
+		this.anim = anim;
 	}
 	public AttackFrame()
 	{
@@ -459,6 +476,7 @@ public class AttackFrame //one beat of an attack
 		blockingLong = false;
 		attackingShort = false;
 		attackingLong = false;
+		anim = "";
 	}
 	
 }

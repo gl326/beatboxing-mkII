@@ -35,8 +35,9 @@ public class PopUp : MonoBehaviour {
 
 
 		this.transform.position = new Vector3(
-			(1.5f*dir)+(dir*beat_dist*(Mathf.Ceil(Mathf.Max(0,beat_target-beats))-Mathf.Pow (Mathf.Max(0,(beats))%1f,2f))),
-			this.transform.position.y,this.transform.position.z);
+			this.transform.position.x,
+			this.transform.position.y,
+				-(dir*beat_dist*(Mathf.Ceil(Mathf.Max(0,beat_target-beats))-Mathf.Pow (Mathf.Max(0,(beats))%1f,2f))));
 
 		/*
 		if (!half){

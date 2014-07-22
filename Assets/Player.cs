@@ -56,11 +56,8 @@ public class Player : MonoBehaviour {
 
 		rightParticles.enableEmission = false;
 		leftParticles.enableEmission = false;
-
-		float timeToNext = (60f/_boxer.BPM());
-		float animLength = animationList[0].clip.length;
-		animation.speed = (animLength/timeToNext)*animationSpeedOffset;
-				origin = apollo.localPosition;
+	
+		origin = apollo.localPosition;
 		//animator = this.GetComponent<Animator>();
 	}
 
@@ -78,6 +75,7 @@ public class Player : MonoBehaviour {
 		rightParticles.enableEmission = false;
 		leftParticles.enableEmission = false;
 		triedAttack = false;
+		string oldAnim = anim;
 
 		if (bigAttack){bigAttack = false; attackingLong = true;}
 		else{
@@ -124,32 +122,17 @@ public class Player : MonoBehaviour {
 			blockingShort=false;
 			blockingLong=true;
 			//bigBlock = true; //makes big block 2 beats
-					anim = "dodge";
+					anim = "duck";
 			break;
 		}
 		}
 		}
 
-		int oldState = animation.GetInteger("state");
-		int newState = oldState;
-		for (int i=0;i<animationList.Length;i+=1){
-			if (animationList[i].name == anim){
-				newState = i;
-					break;
-			}
-		}
 
-		//if (newState!=oldState){
-			animation.SetInteger("state",newState);
-		if (!attackingLong){animation.SetTrigger("beatchange");}
-		float timeToNext = (60f/_boxer.BPM());
-		float animLength = ((animationList[newState].clip.length/(float)animationList[newState].beats));
-		animation.speed = (animLength/timeToNext)*animationSpeedOffset;
-		Debug.Log ("time since last beat: "+(Time.time - oldTime)+". Time to next: "+
-		           (animLength/animation.speed)+", aka "+timeToNext);
 
+		if (!attackingLong){animation.SetTrigger(anim);}
 		oldTime = Time.time;
-		//}
+
 		input = inputs.rest;
 	}
 
@@ -166,6 +149,22 @@ public class Player : MonoBehaviour {
 
 	public bool didInput(){
 		return triedAttack;
+	}
+
+	int animIndex(string a, int def = 0){
+		for (int i=0;i<animationList.Length;i+=1){
+			if (animationList[i].name == a){
+				return i;
+				break;
+			}
+		}
+		return def;
+	}
+
+	void Update(){
+		float timeToNext = (60f/_boxer.BPM());
+		float animLength = animation.GetCurrentAnimatorStateInfo(0).length/(float)animationList[animIndex(anim)].beats;
+		animation.speed = (animLength/timeToNext)*animationSpeedOffset;
 	}
 	
 	// Update is called once per frame
@@ -196,13 +195,11 @@ public class Player : MonoBehaviour {
 public class BeatAnimation //animations with some beat info
 { 
 	public string name;
-	public AnimationClip clip;
 	public int beats;
 	
-	public BeatAnimation(string name, AnimationClip clip, int beats)
+	public BeatAnimation(string name, int beats)
 	{
 		this.name = name;
-		this.clip = clip;
 		this.beats = beats;
 	}
 	
