@@ -17,10 +17,10 @@ public class Player : MonoBehaviour {
 
 	public BeatAnimation[] animationList;
 	private string anim="idle";
-	private Animator animation;
+	public Animator myAnimator;
 	//private AnimationState animator;
 
-	private enum inputs{rest,left,up,right,down}
+	private enum inputs{rest,left,up,right,punch}
 	private inputs input;
 
 	public bool bigAttack = false;
@@ -45,13 +45,16 @@ public class Player : MonoBehaviour {
 	public float hurtShake = 1f;
 	private int hurtBeat = -99;
 
+	private CameraSwoop camSwoop;
+
 	// Use this for initialization
 	void Start () {
 		_boxer = GameObject.FindWithTag("Beatboxer").GetComponent<BeatBoxer>();
 		_metronome = GameObject.FindWithTag("Metronome").GetComponent<Metronome>();
+		camSwoop = GameObject.FindWithTag("MainCamera").GetComponent<CameraSwoop>();
 		hp = hpMax;
 		stamina = staminaMax;
-		animation = GetComponentInChildren<Animator>();
+		//myAnimator = GetComponentInChildren<Animator>();
 		oldTime = Time.time;
 
 		rightParticles.enableEmission = false;
@@ -77,6 +80,8 @@ public class Player : MonoBehaviour {
 		triedAttack = false;
 		string oldAnim = anim;
 
+		camSwoop.UnSwoop();
+
 		if (bigAttack){bigAttack = false; attackingLong = true;}
 		else{
 		if (bigBlock){bigBlock = false;}
@@ -91,7 +96,7 @@ public class Player : MonoBehaviour {
 			anim = "idle";
 					_metronome.HideInput();
 			break;
-		case inputs.right: 
+		case inputs.punch: 
 			attackingShort=true;
 			attackingLong=false;
 			blockingShort=false;
@@ -105,6 +110,7 @@ public class Player : MonoBehaviour {
 			attackingLong=false;
 			blockingShort=true;
 			blockingLong=false;
+					camSwoop.SwoopLeft();
 					anim = "block";
 			break;
 		case inputs.up: 
@@ -116,12 +122,12 @@ public class Player : MonoBehaviour {
 					LoseStamina();
 					anim = "uppercut";
 			break;
-		case inputs.down: 
+		case inputs.right: 
 			attackingShort=false;
 			attackingLong=false;
 			blockingShort=false;
 			blockingLong=true;
-			//bigBlock = true; //makes big block 2 beats
+					camSwoop.SwoopRight();
 					anim = "duck";
 			break;
 		}
@@ -130,7 +136,7 @@ public class Player : MonoBehaviour {
 
 
 
-		if (!attackingLong){animation.SetTrigger(anim);}
+		if (!attackingLong){myAnimator.SetTrigger(anim);}
 		oldTime = Time.time;
 
 		input = inputs.rest;
@@ -163,8 +169,9 @@ public class Player : MonoBehaviour {
 
 	void Update(){
 		float timeToNext = (60f/_boxer.BPM());
-		float animLength = animation.GetCurrentAnimatorStateInfo(0).length/(float)animationList[animIndex(anim)].beats;
-		animation.speed = (animLength/timeToNext)*animationSpeedOffset;
+		float animLength = myAnimator.GetCurrentAnimatorStateInfo(0).length/
+					(float)animationList[animIndex(anim,0)].beats;
+		myAnimator.speed = (animLength/timeToNext)*animationSpeedOffset;
 	}
 	
 	// Update is called once per frame
@@ -182,9 +189,9 @@ public class Player : MonoBehaviour {
 			triedAttack = true;
 		if ((beat >= 1f-beatAllowance || beat<=_boxer.beatDelay) ){ //it was on time
 			if (Input.GetButtonDown("Uppercut")){input = inputs.up;}
-			if (Input.GetButtonDown("Punch")){input = inputs.right;}
+			if (Input.GetButtonDown("Punch")){input = inputs.punch;}
 			if (Input.GetButtonDown("Block")){input = inputs.left;}
-			if (Input.GetButtonDown("Dodge")){input = inputs.down;}
+			if (Input.GetButtonDown("Dodge")){input = inputs.right;}
 		}
 			_metronome.UpdateInput((input!=inputs.rest));
 		}
