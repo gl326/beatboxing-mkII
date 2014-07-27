@@ -4,6 +4,7 @@ using System.Collections;
 public class CameraSwoop : MonoBehaviour {
 	public Transform swoopLeft;
 	public Transform swoopRight;
+	public Transform swoopHit;
 
 	private Transform target = null;
 
@@ -17,6 +18,9 @@ public class CameraSwoop : MonoBehaviour {
 	}
 	public void SwoopRight(){
 		target = swoopRight;
+	}
+	public void SwoopHit(){
+		target = swoopHit;
 	}
 	public void UnSwoop(){
 		target = null;
@@ -42,6 +46,6 @@ public class CameraSwoop : MonoBehaviour {
 			this.transform.localEulerAngles = Vector3.Slerp(this.transform.localEulerAngles,ta,.05f);
 		}
 
-		this.transform.eulerAngles = new Vector3(this.transform.eulerAngles.x,this.transform.eulerAngles.y,0f);
+		//this.transform.eulerAngles = new Vector3(this.transform.eulerAngles.x,this.transform.eulerAngles.y,0f);
 	}
 }

@@ -52,6 +52,7 @@ public class BeatBoxer : MonoBehaviour {
 	private Animator animation;
 	private List<GameObject> popUps;
 	private Camera _mainCamera;
+	private CameraSwoop camSwoop;
 	//private int QueuedFrames = 0;
 
 	public float hurtShake = 0.5f;
@@ -86,6 +87,7 @@ public class BeatBoxer : MonoBehaviour {
 		_bg.lights.GetChild(2).light.color = colorSet.lightColorC;
 
 		_mainCamera = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
+		camSwoop = GameObject.FindWithTag("MainCamera").GetComponent<CameraSwoop>();
 
 		_enemyModel = (Instantiate(boxerModel) as GameObject).transform;
 		_enemyModel.parent = _enemy;
@@ -249,6 +251,7 @@ public class BeatBoxer : MonoBehaviour {
 				else{ActivatePopUp(_player.transform.position+(1.5f*Vector3.up),4,beats); hp -= 1;}
 				_enemyParts.Hit();
 				hurtBeat = Mathf.FloorToInt(beats);
+				camSwoop.SwoopHit();
 			}else{
 				_player.LoseStamina(); //player attacked and whiffed
 				_enemyParts.Shield();
