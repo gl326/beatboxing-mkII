@@ -12,6 +12,10 @@ public class ScreenShake : MonoBehaviour {
 	
 	}
 
+	public Vector3 ShakeTrans(){
+		return trans;
+	}
+
 	public void Shake(float a, float t){
 		amount = a;
 		time  = t;

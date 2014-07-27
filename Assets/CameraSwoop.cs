@@ -25,16 +25,23 @@ public class CameraSwoop : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		Vector3 ta = Vector3.zero;
+		if (target!=null){ta = target.localEulerAngles;}
+		//normalize rotation
+		while((ta.y - this.transform.localEulerAngles.y)>180){ta.y -= 360f;}
+		while((ta.x - this.transform.localEulerAngles.x)>180){ta.x -= 360f;}
+		while((ta.z - this.transform.localEulerAngles.z)>180){ta.z -= 360f;}
+		while((ta.y - this.transform.localEulerAngles.y)<-180){ta.y += 360f;}
+		while((ta.x - this.transform.localEulerAngles.x)<-180){ta.x += 360f;}
+		while((ta.z - this.transform.localEulerAngles.z)<-180){ta.z += 360f;}
 
 		if (target==null){
-			this.transform.localPosition = Vector3.Lerp (this.transform.localPosition,Vector3.zero,.2f);;
+			this.transform.localPosition = Vector3.Lerp (this.transform.localPosition,Vector3.zero,.1f);
+			this.transform.localEulerAngles = Vector3.Slerp(this.transform.localEulerAngles,ta,.2f);
 		}else{
-			ta = target.localEulerAngles;
-			this.transform.localPosition = Vector3.Lerp (this.transform.localPosition,target.localPosition,.3f);
+			this.transform.localPosition = Vector3.Lerp (this.transform.localPosition,target.localPosition,.1f);
+			this.transform.localEulerAngles = Vector3.Slerp(this.transform.localEulerAngles,ta,.05f);
 		}
-		while(Mathf.Abs(ta.y - this.transform.localEulerAngles.y)>180){ta.y -= 360f;}
-		while(Mathf.Abs(ta.x - this.transform.localEulerAngles.x)>180){ta.x -= 360f;}
-		while(Mathf.Abs(ta.z - this.transform.localEulerAngles.z)>180){ta.z -= 360f;}
-		this.transform.localEulerAngles = Vector3.Slerp(this.transform.localEulerAngles,ta,.3f);
+
+		this.transform.eulerAngles = new Vector3(this.transform.eulerAngles.x,this.transform.eulerAngles.y,0f);
 	}
 }
