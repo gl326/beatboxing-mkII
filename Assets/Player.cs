@@ -35,6 +35,7 @@ public class Player : MonoBehaviour {
 
 	public ParticleSystem rightParticles;
 	public ParticleSystem leftParticles;
+	private bool burst = false;
 
 	private Metronome _metronome;
 
@@ -74,10 +75,15 @@ public class Player : MonoBehaviour {
 		stamina = Mathf.Max (0,stamina-1);
 	}
 
+	public void Starburst(){
+		if (left){leftParticles.Emit (30);}
+		else{rightParticles.Emit (30);}
+		Debug.Log("burst?!");
+	}
+
 	void OnBeat(){
-		rightParticles.enableEmission = false;
-		leftParticles.enableEmission = false;
 		triedAttack = false;
+		burst = false;
 		string oldAnim = anim;
 
 		camSwoop.UnSwoop();
@@ -102,8 +108,8 @@ public class Player : MonoBehaviour {
 			blockingShort=false;
 			blockingLong=false; 
 					left = !left;
-					if (left){anim = "punch1"; rightParticles.enableEmission = true;}
-					else{anim = "punch2"; leftParticles.enableEmission = true;}
+					if (left){anim = "punch1";}
+					else{anim = "punch2";}
 			break;
 		case inputs.left: 
 			attackingShort=false;
@@ -172,6 +178,13 @@ public class Player : MonoBehaviour {
 		float animLength = myAnimator.GetCurrentAnimatorStateInfo(0).length/
 					(float)animationList[animIndex(anim,0)].beats;
 		myAnimator.speed = (animLength/timeToNext)*animationSpeedOffset;
+
+		if (!burst && (anim=="punch1" || anim=="punch2") && 
+		    (myAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime>=.2f &&
+		 	myAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime<=.5f)){
+			burst = true;
+			Starburst();
+		}
 	}
 	
 	// Update is called once per frame

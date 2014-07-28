@@ -192,7 +192,7 @@ public class BeatBoxer : MonoBehaviour {
 	}
 
 	void OnBeat(){
-		GameObject.FindWithTag("MainCamera").GetComponent<ScreenShake>().Shake(.05f,.1f);
+		_mainCamera.GetComponent<ScreenShake>().Shake(.05f,.1f);
 		beatTimer = beatDelay;
 		_bg.OnBeat();
 
@@ -222,9 +222,6 @@ public class BeatBoxer : MonoBehaviour {
 			_player.SendMessage("OnBeat");
 		}
 			
-			
-
-
 			/////resolve player states
 
 			if ( //hurting the player, which resets their state
@@ -235,6 +232,8 @@ public class BeatBoxer : MonoBehaviour {
 			_player.SendMessage("Hurt");
 			ActivatePopUp(_player.transform.position+(1.5f*Vector3.up),5,beats,true);
 			_playerParts.Hit();
+			_mainCamera.GetComponent<ScreenShake>().Shake(.1f,1f);
+			_mainCamera.GetComponent<ScreenShake>().Hurt ();
 			}
 
 		if ( //Player attacked
@@ -251,6 +250,7 @@ public class BeatBoxer : MonoBehaviour {
 				else{ActivatePopUp(_player.transform.position+(1.5f*Vector3.up),4,beats); hp -= 1;}
 				_enemyParts.Hit();
 				hurtBeat = Mathf.FloorToInt(beats);
+				_mainCamera.GetComponent<ScreenShake>().Shake(.1f,.15f);
 				camSwoop.SwoopHit();
 			}else{
 				_player.LoseStamina(); //player attacked and whiffed

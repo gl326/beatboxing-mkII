@@ -6,6 +6,7 @@ public class PlayerParticles : MonoBehaviour {
 	public Transform dodgeFX;
 	public Transform shieldFX;
 	public Transform swipeFX;
+	public Transform starburstFX;
 
 	private Vector3 swipeOrigin = Vector3.zero;
 	private Vector3 swipeEnd;
@@ -14,8 +15,6 @@ public class PlayerParticles : MonoBehaviour {
 	private int swipeBeat = 0;
 
 	private BeatBoxer _boxer;
-
-
 
 
 	// Use this for initialization
@@ -28,6 +27,7 @@ public class PlayerParticles : MonoBehaviour {
 		hitFX.particleSystem.enableEmission = false;
 		shieldFX.particleSystem.enableEmission = false;
 		dodgeFX.particleSystem.enableEmission = false;
+		if (starburstFX!=null){starburstFX.particleSystem.enableEmission = false;}
 
 		_boxer = GameObject.FindWithTag("Beatboxer").GetComponent<BeatBoxer>();
 	}
@@ -68,7 +68,8 @@ public class PlayerParticles : MonoBehaviour {
 	}
 
 	public void Hit(){
-		hitFX.particleSystem.Emit(20);
+		hitFX.particleSystem.Emit(30);
+		if (starburstFX!=null){starburstFX.particleSystem.Emit (20);}
 	}
 	public void Dodge(){
 		dodgeFX.particleSystem.Emit(30);

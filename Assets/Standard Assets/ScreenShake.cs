@@ -6,10 +6,12 @@ public class ScreenShake : MonoBehaviour {
 	private float time = 0f;
 	private float amount = 0f;
 	private Vector3 trans = Vector3.zero;
+	private ParticleSystem hurtFX;
 
 	// Use this for initialization
 	void Start () {
-	
+		hurtFX = this.GetComponentInChildren<ParticleSystem>();
+		hurtFX.enableEmission = false;
 	}
 
 	public Vector3 ShakeTrans(){
@@ -19,6 +21,10 @@ public class ScreenShake : MonoBehaviour {
 	public void Shake(float a, float t){
 		amount = a;
 		time  = t;
+	}
+
+	public void Hurt(){
+		hurtFX.Emit (100);
 	}
 	
 	// Update is called once per frame
